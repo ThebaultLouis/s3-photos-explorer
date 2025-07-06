@@ -1,7 +1,11 @@
 {
   "profiles": {
     "S3PhotosExplorerWindowsDesktop (Package)": {
-      "commandName": "MsixPackage"
+      "commandName": "MsixPackage",
+      "environmentVariables": {
+        "BUCKET_NAME": "your-s3-bucket",
+        "IDENTITY_POOL_ID": "your-cognito-identity-pool-id"
+      }
     },
     "S3PhotosExplorerWindowsDesktop (Unpackaged)": {
       "commandName": "Project"

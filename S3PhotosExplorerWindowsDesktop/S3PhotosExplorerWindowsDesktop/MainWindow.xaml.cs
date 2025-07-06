@@ -1,22 +1,24 @@
 using Amazon;
+using Amazon.CognitoIdentity;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon.CognitoIdentity;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 
 namespace S3PhotosExplorerWindowsDesktop
 {
     public sealed partial class MainWindow : Window
     {
-        const string bucketName = "BUCKET_NAME";
-        const string identityPoolId = "IDENTITY_POOL_ID";
-        static readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast1;
+        private readonly string bucketName = Environment.GetEnvironmentVariable("BUCKET_NAME");
+        private readonly string identityPoolId = Environment.GetEnvironmentVariable("IDENTITY_POOL_ID");
+
+        static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest1;
 
         IAmazonS3 s3Client;
 
@@ -57,7 +59,8 @@ namespace S3PhotosExplorerWindowsDesktop
                 Title = "Create Album",
                 Content = inputDialog,
                 PrimaryButtonText = "Create",
-                CloseButtonText = "Cancel"
+                CloseButtonText = "Cancel",
+                XamlRoot = this.Content.XamlRoot
             };
 
             var result = await dialog.ShowAsync();
@@ -89,7 +92,8 @@ namespace S3PhotosExplorerWindowsDesktop
             var dialog = new ContentDialog
             {
                 Title = $"Album: {albumName}",
-                CloseButtonText = "Close"
+                CloseButtonText = "Close",
+                XamlRoot = this.Content.XamlRoot
             };
 
             var panel = new StackPanel();
@@ -119,6 +123,12 @@ namespace S3PhotosExplorerWindowsDesktop
 
         private async Task AddPhoto(string albumName)
         {
+            var messageText = new TextBlock
+            {
+                Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green),
+                Visibility = Visibility.Collapsed
+            };
+
             var picker = new FileOpenPicker();
             picker.FileTypeFilter.Add(".jpg");
             picker.FileTypeFilter.Add(".png");
@@ -135,10 +145,12 @@ namespace S3PhotosExplorerWindowsDesktop
                 {
                     BucketName = bucketName,
                     Key = albumPrefix + file.Name,
-                    InputStream = stream
+                    InputStream = stream,
                 };
                 await s3Client.PutObjectAsync(uploadRequest);
-                ShowMessage("Photo uploaded.");
+
+                messageText.Text = "Photo uploaded successfully.";
+                messageText.Visibility = Visibility.Visible;
             }
         }
 
@@ -148,7 +160,8 @@ namespace S3PhotosExplorerWindowsDesktop
             {
                 Title = "Message",
                 Content = message,
-                CloseButtonText = "OK"
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot
             };
             await dialog.ShowAsync();
         }
