@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "S3PhotosExplorerWindowsDesktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "S3PhotosExplorerWindowsDesktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
